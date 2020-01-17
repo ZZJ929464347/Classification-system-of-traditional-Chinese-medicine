@@ -176,9 +176,12 @@ class HomePageUi(QWidget):
 
     # 获取文件夹里面的图片，并显示到self.imageLabel上
     def getNewLabelImage(self):
-        self.imageNowPath = self.getChooseDirectory + "/" + self.imgNameList[self.imgNumber]
-        jpg = QPixmap(self.imageNowPath).scaled(self.imageLabel.width(), self.imageLabel.height())
-        self.imageLabel.setPixmap(jpg)
+        if self.imgNumber < len(self.imgNameList):
+            self.imageNowPath = self.getChooseDirectory + "/" + self.imgNameList[self.imgNumber]
+            jpg = QPixmap(self.imageNowPath).scaled(self.imageLabel.width(), self.imageLabel.height())
+            self.imageLabel.setPixmap(jpg)
+        else:
+            print("已经到最后一张图片了")
         # print(self.imagePath)
         # print(self.getChooseDirectory)
 
@@ -204,16 +207,19 @@ class HomePageUi(QWidget):
 
     # 当点击打标签的多选框选项时，触发事件
     def on_labelCombobox_Activate(self, index):
-        suffix = self.get_suffix(self.imageNowPath)
-        saveImgPath = self.getSaveDirectory + "/" + str(self.labelCombobox.currentIndex()) + "-" + str(self.saveDirectoryImgNumber) + suffix
-        # 移动图片文件
-        shutil.move(self.imageNowPath, saveImgPath)
-        # 保存文件夹数+1
-        self.saveDirectoryImgNumber = self.saveDirectoryImgNumber + 1
-        # 当前展示的图片+1
-        self.imgNumber = self.imgNumber + 1
-        # 获取文件夹里面的图片，并显示到self.imageLabel上
-        self.getNewLabelImage()
+        if self.imgNumber < len(self.imgNameList):
+            suffix = self.get_suffix(self.imageNowPath)
+            saveImgPath = self.getSaveDirectory + "/" + str(self.labelCombobox.currentIndex()) + "-" + str(self.saveDirectoryImgNumber) + suffix
+            # 移动图片文件
+            shutil.move(self.imageNowPath, saveImgPath)
+            # 保存文件夹数+1
+            self.saveDirectoryImgNumber = self.saveDirectoryImgNumber + 1
+            # 当前展示的图片+1
+            self.imgNumber = self.imgNumber + 1
+            # 获取文件夹里面的图片，并显示到self.imageLabel上
+            self.getNewLabelImage()
+        else:
+            print("已经到最后一张图片了")
         # print("saveImgPath:" + saveImgPath)
         # print(self.labelCombobox.currentIndex())
         # print(self.labelCombobox.currentText())
