@@ -78,14 +78,14 @@ class HomePageUi(QWidget):
         self.lineEditSaveDirectory = QLineEdit()
 
         # 设置栅格布局
-        grid = QGridLayout()
-        grid.setSpacing(10)
+        grid2 = QGridLayout()
+        grid2.setSpacing(10)
 
-        grid.addWidget(buttonChooseDirectory, 1, 1)
-        grid.addWidget(self.lineEditChooseDirectory, 1, 2, 1, 7)
+        grid2.addWidget(buttonChooseDirectory, 1, 1)
+        grid2.addWidget(self.lineEditChooseDirectory, 1, 2, 1, 7)
 
-        grid.addWidget(buttonSaveDirectory, 2, 1)
-        grid.addWidget(self.lineEditSaveDirectory, 2, 2, 1, 7)
+        grid2.addWidget(buttonSaveDirectory, 2, 1)
+        grid2.addWidget(self.lineEditSaveDirectory, 2, 2, 1, 7)
 
         # 显示图片的label
         self.imageLabel = QLabel(self)
@@ -96,21 +96,21 @@ class HomePageUi(QWidget):
                                       )
 
         # 将图片的label加入栅格布局中
-        grid.addWidget(self.imageLabel, 3, 2, 6, 5)
+        grid2.addWidget(self.imageLabel, 3, 2, 6, 5)
 
         # 下一张图片按钮
         buttonNextImage = QPushButton(self)
         buttonNextImage.setObjectName("buttonNextImage")
         buttonNextImage.setText("下一张图像")
         buttonNextImage.clicked.connect(self.nextImgFile)
-        grid.addWidget(buttonNextImage, 10, 2, 1, 1)
+        grid2.addWidget(buttonNextImage, 10, 2, 1, 1)
 
         # 设置删除图像按钮
         buttonDelImage = QPushButton(self)
         buttonDelImage.setObjectName("buttonDelImage")
         buttonDelImage.setText("删除图像")
         buttonDelImage.clicked.connect(self.delFile)
-        grid.addWidget(buttonDelImage, 10, 4, 1, 1)
+        grid2.addWidget(buttonDelImage, 10, 4, 1, 1)
 
         # 设置打标签图像下拉复选框
         self.labelCombobox = QComboBox(self)
@@ -119,11 +119,10 @@ class HomePageUi(QWidget):
         self.init_labelCombobox()
         # 增加选中事件
         self.labelCombobox.activated.connect(self.on_labelCombobox_Activate)
-        grid.addWidget(self.labelCombobox, 10, 6, 1, 1)
-
+        grid2.addWidget(self.labelCombobox, 10, 6, 1, 1)
 
         # 将垂直布局加入窗体
-        self.stack2.setLayout(grid)
+        self.stack2.setLayout(grid2)
 
 
     def stack3UI(self):
@@ -136,6 +135,7 @@ class HomePageUi(QWidget):
         layout.addWidget(QCheckBox('高数'))
 
         self.stack3.setLayout(layout)
+
 
     # 槽-----------------------------界面切换
     def display(self,i):
@@ -168,6 +168,7 @@ class HomePageUi(QWidget):
         result = os.listdir(directoryPath)
         return result
 
+
     # 获取下一张图片
     def nextImgFile(self):
         self.imgNumber = self.imgNumber + 1
@@ -196,6 +197,7 @@ class HomePageUi(QWidget):
             self.getNewLabelImage()
         else:
             print('no such file:%s' % self.imageNowPath)
+
 
     ####### 初始化labelCombobox打标签的下拉选项框数据  增加单项元素，不带数据  #########
     def init_labelCombobox(self):
