@@ -56,7 +56,56 @@ class HomePageUi(QWidget):
 
 
     def stack1UI(self):
-        pass
+        # 设置栅格布局
+        grid1 = QGridLayout()
+        grid1.setSpacing(10)
+
+        # 设置搜索中药饮片名称label
+        self.searchNameLabel = QLabel(self)
+        self.searchNameLabel.setText("中药饮片名称：")
+        grid1.addWidget(self.searchNameLabel, 1, 1, 1, 1)
+
+        # 设置搜索的开始爬取页数label
+        self.searchStartPageLabel = QLabel(self)
+        self.searchStartPageLabel.setText("开始页数：")
+        grid1.addWidget(self.searchStartPageLabel, 3, 1, 1, 1)
+
+        # 设置需要搜索的爬取页数label
+        self.searchCountLabel = QLabel(self)
+        self.searchCountLabel.setText("搜索页数：")
+        grid1.addWidget(self.searchCountLabel, 5, 1, 1, 1)
+
+        # 设置进度显示label
+        self.spiderInfo = QLabel(self)
+        self.spiderInfo.setStyleSheet("QLabel{background:white;}"
+                                      "QLabel{color:rgb(300,300,300,120);font-size:10px;font-weight:bold;font-family:宋体;}"
+                                      )
+        grid1.addWidget(self.spiderInfo, 1, 8, 20, 4)
+
+        # 设置搜索中药饮片名称输入框
+        self.lineEditSearchName = QLineEdit()
+        grid1.addWidget(self.lineEditSearchName, 1, 2, 1, 5)
+        #
+        # 设置搜索的开始爬取页数输入框
+        self.lineEditStartPage = QLineEdit()
+        grid1.addWidget(self.lineEditStartPage, 3, 2, 1, 2)
+
+        # 设置需要搜索的爬取页数输入框
+        self.lineEditSearchCount = QLineEdit()
+        grid1.addWidget(self.lineEditSearchCount, 5, 2, 1, 2)
+
+        # 设置开始爬取按钮1
+        buttonStartSpider = QtWidgets.QPushButton(self)
+        buttonStartSpider.setObjectName("buttonStartSpider")
+        buttonStartSpider.setText("开始爬取")
+        # # buttonStartSpider.clicked.connect(self.getDirectory)
+        grid1.addWidget(buttonStartSpider, 18, 2, 1, 4)
+
+
+
+
+        # 将栅格布局加入窗体
+        self.stack1.setLayout(grid1)
 
 
     # 图像预处理模块
@@ -121,7 +170,7 @@ class HomePageUi(QWidget):
         self.labelCombobox.activated.connect(self.on_labelCombobox_Activate)
         grid2.addWidget(self.labelCombobox, 10, 6, 1, 1)
 
-        # 将垂直布局加入窗体
+        # 将栅格布局加入窗体
         self.stack2.setLayout(grid2)
 
 
