@@ -65,15 +65,20 @@ class HomePageUi(QWidget):
         self.searchNameLabel.setText("中药饮片名称：")
         grid1.addWidget(self.searchNameLabel, 1, 1, 1, 1)
 
+        # 设置图片保存目录位置label
+        self.spiderSaveDirectory = QLabel(self)
+        self.spiderSaveDirectory.setText("图片保存目录位置：")
+        grid1.addWidget(self.spiderSaveDirectory, 3, 1, 1, 1)
+
         # 设置搜索的开始爬取页数label
         self.searchStartPageLabel = QLabel(self)
         self.searchStartPageLabel.setText("开始页数：")
-        grid1.addWidget(self.searchStartPageLabel, 3, 1, 1, 1)
+        grid1.addWidget(self.searchStartPageLabel, 5, 1, 1, 1)
 
         # 设置需要搜索的爬取页数label
         self.searchCountLabel = QLabel(self)
         self.searchCountLabel.setText("搜索页数：")
-        grid1.addWidget(self.searchCountLabel, 5, 1, 1, 1)
+        grid1.addWidget(self.searchCountLabel, 7, 1, 1, 1)
 
         # 设置进度显示label
         self.spiderInfo = QLabel(self)
@@ -85,17 +90,28 @@ class HomePageUi(QWidget):
         # 设置搜索中药饮片名称输入框
         self.lineEditSearchName = QLineEdit()
         grid1.addWidget(self.lineEditSearchName, 1, 2, 1, 5)
-        #
+
+        # 设置图片保存目录位置的输入框
+        self.lineEditSpiderSaveDirectory = QLineEdit()
+        grid1.addWidget(self.lineEditSpiderSaveDirectory, 3, 2, 1, 3)
+
         # 设置搜索的开始爬取页数输入框
         self.lineEditStartPage = QLineEdit()
-        grid1.addWidget(self.lineEditStartPage, 3, 2, 1, 2)
+        grid1.addWidget(self.lineEditStartPage, 5, 2, 1, 2)
 
         # 设置需要搜索的爬取页数输入框
         self.lineEditSearchCount = QLineEdit()
-        grid1.addWidget(self.lineEditSearchCount, 5, 2, 1, 2)
+        grid1.addWidget(self.lineEditSearchCount, 7, 2, 1, 2)
+
+        # 设置选取爬虫模块图像文件夹保存目录按钮1
+        buttonSpiderSaveDirectory = QPushButton(self)
+        buttonSpiderSaveDirectory.setObjectName("buttonSpiderSaveDirectory")
+        buttonSpiderSaveDirectory.setText("选择保存目录")
+        buttonSpiderSaveDirectory.clicked.connect(self.getSpiderSaveDirectory)
+        grid1.addWidget(buttonSpiderSaveDirectory, 3, 5, 1, 1)
 
         # 设置开始爬取按钮1
-        buttonStartSpider = QtWidgets.QPushButton(self)
+        buttonStartSpider = QPushButton(self)
         buttonStartSpider.setObjectName("buttonStartSpider")
         buttonStartSpider.setText("开始爬取")
         # # buttonStartSpider.clicked.connect(self.getDirectory)
@@ -190,6 +206,12 @@ class HomePageUi(QWidget):
     def display(self,i):
         #设置当前可见的选项卡的索引
         self.stack.setCurrentIndex(i)
+
+
+    # 槽-----------------------------选择爬虫保存图像文件夹
+    def getSpiderSaveDirectory(self):
+        self.getSpiderSaveDirectoryPath = QFileDialog.getExistingDirectory(self, "选取文件夹", "./")  # 起始路径
+        self.lineEditSpiderSaveDirectory.setText(self.getSpiderSaveDirectoryPath)
 
 
     #槽-----------------------------获取预处理图像文件夹
