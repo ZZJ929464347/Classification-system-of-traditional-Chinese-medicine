@@ -220,9 +220,12 @@ class HomePageUi(QWidget):
         self.lineEditChooseDirectory.setText(self.getChooseDirectory)
         # 从选取文件夹以后，开始遍历所有的图片，并从list[0]开始遍历图片
         self.imgNumber = 0
-        self.imgNameList = self.randomGetImage(self.getChooseDirectory)
-        # 获取文件夹里面的图片，并显示到self.imageLabel上
-        self.getNewLabelImage()
+        try:
+            self.imgNameList = self.randomGetImage(self.getChooseDirectory)
+            # 获取文件夹里面的图片，并显示到self.imageLabel上
+            self.getNewLabelImage()
+        except:
+            print("预处理图像文件夹为空")
 
 
     # 槽-----------------------------获取保存图像文件夹
@@ -230,8 +233,11 @@ class HomePageUi(QWidget):
         self.getSaveDirectory = QFileDialog.getExistingDirectory(self, "选取文件夹", "./")  # 起始路径
         self.lineEditSaveDirectory.setText(self.getSaveDirectory)
         # 获取保存图像文件夹当前文件的个数
-        self.saveDirectoryImgNumber = len(os.listdir(self.getSaveDirectory)) + 1
-        print(self.saveDirectoryImgNumber)
+        try:
+            self.saveDirectoryImgNumber = len(os.listdir(self.getSaveDirectory)) + 1
+            print(self.saveDirectoryImgNumber)
+        except:
+            print("保存图像文件夹为空")
 
 
     # 从文件夹中获取图像文件名称，但是不是有序的
