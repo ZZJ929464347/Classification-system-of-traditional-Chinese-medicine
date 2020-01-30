@@ -11,6 +11,7 @@ import urllib.parse
 import urllib.error
 # 设置超时
 import time
+import sys
 
 timeout = 5
 # 代表经过t秒后，如果还未下载成功，自动跳入下一次操作，此次下载失败。
@@ -58,10 +59,10 @@ class Crawler:
 
         # 保存图片
     def save_image(self, rsp_data, word):
-        if not os.path.exists("./" + word):
-            os.mkdir("./" + word)
+        if not os.path.exists(self.__saveDirectoryPath + "/" + word):
+            os.mkdir(self.__saveDirectoryPath + "/" + word)
         # 判断名字是否重复，获取图片长度
-        self.__counter = len(os.listdir('./' + word)) + 1
+        self.__counter = len(os.listdir(self.__saveDirectoryPath + "/" + word)) + 1
         for image_info in rsp_data['imgs']:
             # print("image_info为：" + str(image_info))
             try:
@@ -78,7 +79,7 @@ class Crawler:
                 # 使用定义的opener作为全局opener
                 urllib.request.install_opener(opener)
                 # 保存图片  urlretrieve()方法直接将远程数据下载到本地   param1:下载地址  param2：本地保存位置
-                urllib.request.urlretrieve(image_info['objURL'], './' + word + '/' + str(self.__category) + '-' + str(self.__counter) + str(suffix))
+                urllib.request.urlretrieve(image_info['objURL'], self.__saveDirectoryPath + '/' + word + '/' + str(self.__category) + '-' + str(self.__counter) + str(suffix))
             except urllib.error.HTTPError as urllib_err:
                 print(urllib_err)
                 continue
@@ -94,7 +95,7 @@ class Crawler:
         return
 
     # 开始获取
-    def get_images(self, word='美女'):
+    def get_images(self, word='中药'):
         # 大概意思是，按照标准，URL只允许一部分ASCII字符，其他字符（如汉字）是不符合标准的，此时就要进行编码。因为我在构造URL的过程中要使用到中文：
         search = urllib.parse.quote(word)
         # pn int 图片数
@@ -133,7 +134,7 @@ class Crawler:
         print("下载任务结束")
         return
 
-    def start(self, word, spider_page_num=1, start_page=1):
+    def start(self, word, start_page=1, spider_page_num=1, DirectoryPath='.'):
         """
         爬虫入口
         :param word: 抓取的关键词
@@ -144,15 +145,20 @@ class Crawler:
         self.__start_amount = (start_page - 1) * 60
         self.__amount = spider_page_num * 60 + self.__start_amount
         self.__category = self.get_category(word)
+        self.__saveDirectoryPath = DirectoryPath
         self.get_images(word)
 
 
 if __name__ == '__main__':
-    crawler = Crawler(1)  # 抓取延迟为 0.05
 
-    crawler.start('苍术中药', 10, 1)  # 抓取关键词，总数为 10 页（即总共 10*60=600 张），开始页码为 1   从第6页开始，爬取五页
-    crawler.start('苍耳子中药', 10, 1)
-    crawler.start('决明子中药', 10, 1)
-    crawler.start('枳实中药', 10, 1)
-    crawler.start('天花粉中药', 10, 1)
-    crawler.start('黄连中药', 10, 1)
+    # crawler.start('苍术中药', 1, 10)  # 抓取关键词，总数为 10 页（即总共 10*60=600 张），开始页码为 1   从第6页开始，爬取五页       1,10    11,10
+    # crawler.start('苍耳子中药', 1, 10)
+    # crawler.start('决明子中药', 1, 10)
+    # crawler.start('枳实中药', 1, 10)
+    # crawler.start('天花粉中药', 1, 10)
+    # crawler.start('黄连中药', 1, 10)
+    if len(sys.argv) != 5:
+        print("输入格式错误")
+    else:
+        crawler = Crawler(1)  # 抓取延迟为 0.05
+        crawler.start(sys.argv[1], int(sys.argv[2]), int(sys.argv[3]), sys.argv[4])

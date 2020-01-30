@@ -6,6 +6,12 @@ from PyQt5.QtWidgets import *
 import os
 import re
 import shutil
+import shlex
+import subprocess
+import time
+import tempfile
+from PyQt5.QtCore import QThread, pyqtSignal
+
 
 class HomePageUi(QWidget):
     def __init__(self, parent=None):
@@ -80,11 +86,8 @@ class HomePageUi(QWidget):
         self.searchCountLabel.setText("搜索页数：")
         grid1.addWidget(self.searchCountLabel, 7, 1, 1, 1)
 
-        # 设置进度显示label
-        self.spiderInfo = QLabel(self)
-        self.spiderInfo.setStyleSheet("QLabel{background:white;}"
-                                      "QLabel{color:rgb(300,300,300,120);font-size:10px;font-weight:bold;font-family:宋体;}"
-                                      )
+        # 设置进度显示Text
+        self.spiderInfo = QTextEdit()
         grid1.addWidget(self.spiderInfo, 1, 8, 20, 4)
 
         # 设置搜索中药饮片名称输入框
@@ -111,11 +114,11 @@ class HomePageUi(QWidget):
         grid1.addWidget(buttonSpiderSaveDirectory, 3, 5, 1, 1)
 
         # 设置开始爬取按钮1
-        buttonStartSpider = QPushButton(self)
-        buttonStartSpider.setObjectName("buttonStartSpider")
-        buttonStartSpider.setText("开始爬取")
-        # # buttonStartSpider.clicked.connect(self.getDirectory)
-        grid1.addWidget(buttonStartSpider, 18, 2, 1, 4)
+        self.buttonStartSpider = QPushButton(self)
+        self.buttonStartSpider.setObjectName("buttonStartSpider")
+        self.buttonStartSpider.setText("开始爬取")
+        self.buttonStartSpider.clicked.connect(self.startSpider)
+        grid1.addWidget(self.buttonStartSpider, 18, 2, 1, 4)
 
 
 
@@ -240,6 +243,26 @@ class HomePageUi(QWidget):
             print("保存图像文件夹为空")
 
 
+    # 槽-----------------------------点击爬虫按钮，开始爬取
+    def startSpider(self):
+        medicineName = self.lineEditSearchName.text()
+        medicineStart_page = self.lineEditStartPage.text()
+        medicineSpider_page_num = self.lineEditSearchCount.text()
+        saveDirectoryPath = self.lineEditSpiderSaveDirectory.text()
+
+        # 使用创建好的爬虫运行进程执行，避免父进程出现假死现象
+        self.thread_1 = ThreadCrawl(medicineName, medicineStart_page, medicineSpider_page_num, saveDirectoryPath)
+        # thread_1的trigger与槽print_in_textEdit连接，方便在子线程内直接发射信号
+        self.thread_1.trigger.connect(self.print_in_textEdit)
+        self.thread_1.start()
+
+
+    # 将爬虫的控制台信息显示在spiderInfo控件上
+    def print_in_textEdit(self, msg):
+        self.spiderInfo.append(msg)
+        self.thread_1.exit()
+
+
     # 从文件夹中获取图像文件名称，但是不是有序的
     def randomGetImage(self, directoryPath):
         result = os.listdir(directoryPath)
@@ -314,4 +337,28 @@ class HomePageUi(QWidget):
             return m.group(0)
         else:
             return '.jpeg'
+
+
+
+# 设置一个线程，用来实时显示爬虫的最新信息
+class ThreadCrawl(QThread):
+    trigger = pyqtSignal(str)
+
+    def __init__(self, name, spider_page_num, start_page, saveDirectoryPath):
+        super(ThreadCrawl, self).__init__()
+        self.name = name
+        self.spider_page_num = spider_page_num
+        self.start_page = start_page
+        self.saveDirectoryPath = saveDirectoryPath
+
+    def run(self):
+        shell_cmd = "python ../爬虫.py" + " " + str(self.name) + " " + str(self.spider_page_num) + " " + str(self.start_page) + " " + str(self.saveDirectoryPath)
+        cmd = shlex.split(shell_cmd)
+        p = subprocess.Popen(cmd, shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        while p.poll() is None:
+            line = p.stdout.readline().decode("UTF-8")
+            line = line.strip()
+            if line:
+                self.trigger.emit(str(line))
+
 
