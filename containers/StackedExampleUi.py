@@ -11,6 +11,7 @@ import subprocess
 import time
 import tempfile
 from PyQt5.QtCore import QThread, pyqtSignal
+from CNNnet.predictSingleImg import CNN
 
 
 class HomePageUi(QWidget):
@@ -192,17 +193,51 @@ class HomePageUi(QWidget):
         # 将栅格布局加入窗体
         self.stack2.setLayout(grid2)
 
-
+    # 图像预测模块
     def stack3UI(self):
-        # 水平布局
-        layout = QHBoxLayout()
 
-        # 添加控件到布局中
-        layout.addWidget(QLabel('科目'))
-        layout.addWidget(QCheckBox('物理'))
-        layout.addWidget(QCheckBox('高数'))
+        # 设置栅格布局
+        grid3 = QGridLayout()
+        grid3.setSpacing(10)
 
-        self.stack3.setLayout(layout)
+        # 设置加载待分类图片按钮
+        buttonChoosePredictImg = QtWidgets.QPushButton(self)
+        buttonChoosePredictImg.setObjectName("buttonChoosePredictImg")
+        buttonChoosePredictImg.setText("选择待分类图像")
+        buttonChoosePredictImg.clicked.connect(self.getPredictImgPath)
+
+        # 设置加载待分类图片编辑框
+        self.lineEditChoosePredictImg = QLineEdit()
+
+        grid3.addWidget(buttonChoosePredictImg, 1, 1)
+        grid3.addWidget(self.lineEditChoosePredictImg, 1, 2, 1, 7)
+
+        # 显示预测图片的label
+        self.predictImageLabel = QLabel(self)
+        self.predictImageLabel.setText("                  显示预测图片")
+        self.predictImageLabel.setFixedSize(800, 700)
+        self.predictImageLabel.setStyleSheet("QLabel{background:white;}"
+                                      "QLabel{color:rgb(300,300,300,120);font-size:10px;font-weight:bold;font-family:宋体;}"
+                                      )
+
+        # 将预测图片的label加入栅格布局中
+        grid3.addWidget(self.predictImageLabel, 3, 2, 6, 5)
+
+        # 设置加载模型按钮
+        buttonLoadModel = QtWidgets.QPushButton(self)
+        buttonLoadModel.setObjectName("buttonLoadModel")
+        buttonLoadModel.setText("加载模型")
+        buttonLoadModel.clicked.connect(self.loadModel)
+        grid3.addWidget(buttonLoadModel, 9, 3)
+
+        # 设置预测中药图像按钮
+        buttonPredictImg = QtWidgets.QPushButton(self)
+        buttonPredictImg.setObjectName("buttonPredictImg")
+        buttonPredictImg.setText("预测中药图像")
+        buttonPredictImg.clicked.connect(self.predictImg)
+        grid3.addWidget(buttonPredictImg, 9, 5)
+
+        self.stack3.setLayout(grid3)
 
 
     # 槽-----------------------------界面切换
@@ -241,6 +276,27 @@ class HomePageUi(QWidget):
             print(self.saveDirectoryImgNumber)
         except:
             print("保存图像文件夹为空")
+
+
+    # 槽-----------------------------选择待预测中药图像文件位置
+    def getPredictImgPath(self):
+        self.getPredictImgPath, _  = QFileDialog.getOpenFileName(self, "选取文件", "./")  # 起始路径
+        self.lineEditChoosePredictImg.setText(self.getPredictImgPath)
+        jpg = QPixmap(self.getPredictImgPath).scaled(self.predictImageLabel.width(), self.predictImageLabel.height())
+        self.predictImageLabel.setPixmap(jpg)
+
+
+    # 槽-----------------------------加载模型
+    def loadModel(self):
+        self.cnn = CNN()
+        self.cnn.loadModel()
+        QMessageBox.about(self, "提示", "模型加载成功")
+
+
+    # 槽-----------------------------预测中药图像
+    def predictImg(self):
+        result = self.cnn.predict(self.getPredictImgPath)
+        QMessageBox.about(self, "预测结果", result)
 
 
     # 槽-----------------------------点击爬虫按钮，开始爬取
