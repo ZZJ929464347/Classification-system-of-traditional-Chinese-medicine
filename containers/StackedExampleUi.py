@@ -29,22 +29,26 @@ class HomePageUi(QWidget):
         self.leftlist.insertItem(0,'爬虫')
         self.leftlist.insertItem(1,'图像预处理')
         self.leftlist.insertItem(2,'图像预测')
+        self.leftlist.insertItem(3,'中药查询')
 
-        #创建三个小控件
+        #创建四个小控件
         self.stack1=QWidget()
         self.stack2=QWidget()
         self.stack3=QWidget()
+        self.stack4=QWidget()
 
         # self.stack1UI()
         self.stack1UI()
         self.stack2UI()
         self.stack3UI()
+        self.stack4UI()
 
-        #在QStackedWidget对象中填充了三个子控件
+        #在QStackedWidget对象中填充了四个子控件
         self.stack=QStackedWidget(self)
         self.stack.addWidget(self.stack1)
         self.stack.addWidget(self.stack2)
         self.stack.addWidget(self.stack3)
+        self.stack.addWidget(self.stack4)
 
         # 增加比例分割器
         splitter = QSplitter(Qt.Horizontal)
@@ -239,6 +243,37 @@ class HomePageUi(QWidget):
 
         self.stack3.setLayout(grid3)
 
+    def stack4UI(self):
+        # 设置栅格布局
+        grid4 = QGridLayout()
+        grid4.setSpacing(10)
+
+        # 设置中药搜索按钮
+        buttonSearchMedical = QtWidgets.QPushButton(self)
+        buttonSearchMedical.setObjectName("buttonSearchMedical")
+        buttonSearchMedical.setText("搜索")
+        buttonSearchMedical.clicked.connect(self.serchMedical)
+
+        # 设置中药搜索编辑框
+        self.lineEditSearchMedical = QLineEdit()
+
+        grid4.addWidget(self.lineEditSearchMedical, 1, 1, 1, 7)
+        grid4.addWidget(buttonSearchMedical, 1, 8, 1, 1)
+
+        # 显示中药搜索结果图片展示的label
+        self.searchResultImageShowLabel = QLabel(self)
+        self.searchResultImageShowLabel.setText("                  显示搜索结果图片")
+        self.searchResultImageShowLabel.setFixedSize(360, 360)
+        self.searchResultImageShowLabel.setStyleSheet("QLabel{background:white;}"
+                                             "QLabel{color:rgb(300,300,300,120);font-size:10px;font-weight:bold;font-family:宋体;}"
+                                             )
+        grid4.addWidget(self.searchResultImageShowLabel, 3, 1, 3, 3)
+
+        # 设置中药搜索结果文字展示编辑框
+        self.lineEditResultShow = QTextEdit()
+        grid4.addWidget(self.lineEditResultShow, 3, 4, 7, 5)
+
+        self.stack4.setLayout(grid4)
 
     # 槽-----------------------------界面切换
     def display(self,i):
@@ -282,6 +317,7 @@ class HomePageUi(QWidget):
     def getPredictImgPath(self):
         self.getPredictImgPath, _  = QFileDialog.getOpenFileName(self, "选取文件", "./")  # 起始路径
         self.lineEditChoosePredictImg.setText(self.getPredictImgPath)
+        print(self.getPredictImgPath)
         jpg = QPixmap(self.getPredictImgPath).scaled(self.predictImageLabel.width(), self.predictImageLabel.height())
         self.predictImageLabel.setPixmap(jpg)
 
@@ -298,6 +334,16 @@ class HomePageUi(QWidget):
         result = self.cnn.predict(self.getPredictImgPath)
         QMessageBox.about(self, "预测结果", result)
 
+
+    # 槽-----------------------------搜索中药
+    def serchMedical(self):
+        # 显示搜索的中药图片
+        path = "C:/Users/dell/Desktop/test/2.jpg"
+        jpg2 = QPixmap(path).scaled(self.searchResultImageShowLabel.width(), self.searchResultImageShowLabel.height())
+        self.searchResultImageShowLabel.setPixmap(jpg2)
+        # 显示搜索的中药信息
+        self.lineEditResultShow.setText(
+            "【功效与作用】清热明目、润肠通便。属清热药下分类的清虚热药\n【临床应用】用量10～15克，煎汤内服，大量可用至30克；或研末；或泡茶饮。外用：适量，研末调敷。用治虚火上攻或肝经风热等所致目赤肿痛、羞明多泪以及夜盲症；热结便秘、肠燥便秘；肝阳上亢之头晕头痛等。")
 
     # 槽-----------------------------点击爬虫按钮，开始爬取
     def startSpider(self):
