@@ -12,6 +12,7 @@ import time
 import tempfile
 from PyQt5.QtCore import QThread, pyqtSignal
 from CNNnet.predictSingleImg import CNN
+from Mysql.DataBase import Mysql
 
 
 class HomePageUi(QWidget):
@@ -337,13 +338,20 @@ class HomePageUi(QWidget):
 
     # 槽-----------------------------搜索中药
     def serchMedical(self):
-        # 显示搜索的中药图片
-        path = "C:/Users/dell/Desktop/test/2.jpg"
-        jpg2 = QPixmap(path).scaled(self.searchResultImageShowLabel.width(), self.searchResultImageShowLabel.height())
-        self.searchResultImageShowLabel.setPixmap(jpg2)
-        # 显示搜索的中药信息
-        self.lineEditResultShow.setText(
-            "【功效与作用】清热明目、润肠通便。属清热药下分类的清虚热药\n【临床应用】用量10～15克，煎汤内服，大量可用至30克；或研末；或泡茶饮。外用：适量，研末调敷。用治虚火上攻或肝经风热等所致目赤肿痛、羞明多泪以及夜盲症；热结便秘、肠燥便秘；肝阳上亢之头晕头痛等。")
+        mysql = Mysql()
+        result = mysql.show(self.lineEditSearchMedical.text())
+        if  result == []:
+            QMessageBox.about(self, "提示", "无结果，请重新查询")
+        else:
+            name, info, imgPath = result
+            print(imgPath)
+            # 显示搜索的中药图片
+            jpg = QPixmap(imgPath).scaled(self.searchResultImageShowLabel.width(),
+                                           self.searchResultImageShowLabel.height())
+            self.searchResultImageShowLabel.setPixmap(jpg)
+            # 显示搜索的中药信息
+            self.lineEditResultShow.setText(info)
+        mysql.close()
 
     # 槽-----------------------------点击爬虫按钮，开始爬取
     def startSpider(self):
