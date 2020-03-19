@@ -21,9 +21,9 @@ socket.setdefaulttimeout(timeout)
 class Crawler:
     # 睡眠时长
     __time_sleep = 0.1
-    __amount = 0    #结尾数量
-    __start_amount = 0   #开始个数
-    __counter = 0  #文件名的第几个
+    __end_amount = 0    #结尾编号
+    __start_amount = 0   #开始编号
+    __counter = 0  #每个种类从1开始编号
     __category = 100  #种类类别，用于保运在图片名称上
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:23.0) Gecko/20100101 Firefox/23.0'}
 
@@ -100,7 +100,7 @@ class Crawler:
         search = urllib.parse.quote(word)
         # pn int 图片数
         pn = self.__start_amount
-        while pn < self.__amount:
+        while pn < self.__end_amount:
 
             url = 'http://image.baidu.com/search/avatarjson?tn=resultjsonavatarnew&ie=utf-8&word=' + search + '&cg=girl&pn=' + str(
                 pn) + '&rn=60&itg=0&z=0&fr=&width=&height=&lm=-1&ic=0&s=0&st=-1&gsm=1e0000001e'
@@ -125,6 +125,7 @@ class Crawler:
             else:
                 # 解析json
                 rsp_data = json.loads(rsp)
+                # 遍历每页的60张图片并保存到本地
                 self.save_image(rsp_data, word)
                 # 读取下一页
                 print("下载下一页")
@@ -138,12 +139,15 @@ class Crawler:
         """
         爬虫入口
         :param word: 抓取的关键词
-        :param spider_page_num: 需要抓取数据页数 总抓取图片数量为 页数x60
         :param start_page:起始页数
+        :param spider_page_num: 需要抓取数据页数 总抓取图片数量为 页数x60
+        :param DirectoryPath：保存路径
         :return:
         """
+        # 判断从第几张图片开始
         self.__start_amount = (start_page - 1) * 60
-        self.__amount = spider_page_num * 60 + self.__start_amount
+        # 判断到第几张图片结束
+        self.__end_amount = spider_page_num * 60 + self.__start_amount
         self.__category = self.get_category(word)
         self.__saveDirectoryPath = DirectoryPath
         self.get_images(word)
@@ -151,7 +155,7 @@ class Crawler:
 
 if __name__ == '__main__':
 
-    # crawler.start('苍术中药', 1, 10)  # 抓取关键词，总数为 10 页（即总共 10*60=600 张），开始页码为 1   从第6页开始，爬取五页       1,10    11,10
+    # crawler.start('苍术中药', 1, 10)  # 抓取关键词，总数为 10 页（即总共 10*60=600 张），开始页码为 1   从第1页开始，爬取10页       1,10    11,10
     # crawler.start('苍耳子中药', 1, 10)
     # crawler.start('决明子中药', 1, 10)
     # crawler.start('枳实中药', 1, 10)
