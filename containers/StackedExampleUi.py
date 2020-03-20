@@ -1,4 +1,3 @@
-import sys
 from PyQt5 import QtWidgets
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
@@ -8,8 +7,6 @@ import re
 import shutil
 import shlex
 import subprocess
-import time
-import tempfile
 from PyQt5.QtCore import QThread, pyqtSignal
 from CNNnet.predictSingleImg import CNN
 from Mysql.DataBase import Mysql
@@ -297,6 +294,13 @@ class HomePageUi(QWidget):
         # 将预测图片的label加入栅格布局中
         grid3.addWidget(self.predictImageLabel, 3, 2, 6, 5)
 
+        # 设置选择分类网络下拉复选框
+        self.netCombobox = QComboBox(self)
+        self.netCombobox.setObjectName("netCombobox")
+        # 初始化combobox
+        self.init_netCombobox()
+        grid3.addWidget(self.netCombobox, 9, 2, 1, 1)
+
         # 设置加载模型按钮
         buttonLoadModel = QtWidgets.QPushButton(self)
         buttonLoadModel.setObjectName("buttonLoadModel")
@@ -402,7 +406,7 @@ class HomePageUi(QWidget):
 
     # 槽-----------------------------加载模型
     def loadModel(self):
-        self.cnn = CNN()
+        self.cnn = CNN(self.netCombobox.currentIndex())
         self.cnn.loadModel()
         QMessageBox.about(self, "提示", "模型加载成功")
 
@@ -484,6 +488,13 @@ class HomePageUi(QWidget):
         for i in range(len(items_list)):
             self.labelCombobox.addItem(items_list[i])
         self.labelCombobox.setCurrentIndex(-1)
+
+    ####### 初始化netCombobox选择网络的下拉选项框数据  增加单项元素，不带数据  #########
+    def init_netCombobox(self):
+        items_list = ['vgg16-----0', 'resnet50---1', 'inceptionV3---2']
+        for i in range(len(items_list)):
+            self.netCombobox.addItem(items_list[i])
+        self.netCombobox.setCurrentIndex(0)
 
     # 当点击打标签的多选框选项时，触发事件
     def on_labelCombobox_Activate(self, index):
