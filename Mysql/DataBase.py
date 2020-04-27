@@ -1,21 +1,5 @@
 import pymysql
 
-# #连接数据库
-# conn=pymysql.connect(host = '127.0.0.1' # 连接名称，默认127.0.0.1 
-# ,user = 'root' # 用户名
-# ,passwd='root' # 密码
-# ,port=3306 # 端口，默认为3306
-# ,db='medical' # 数据库名称
-# ,charset='utf8' # 字符编码
-# )
-# cur = conn.cursor() # 生成游标对象 
-# sql="select * from Info_table " # SQL语句
-# cur.execute(sql) # 执行SQL语句
-# data = cur.fetchall() # 通过fetchall方法获得数据
-# print(data[0][1])
-# cur.close() # 关闭游标
-# conn.close() # 关闭连接
-
 
 class Mysql(object):
     def __init__(self):
@@ -37,8 +21,10 @@ class Mysql(object):
             self.cur = self.conn.cursor()
             print("连接数据库成功")
 
+
+    # 搜索中药信息
     def show(self, name):
-        sql = "select * from Info_table where name = '%s'" %name
+        sql = "select * from info_table where name = '%s'" %name
         try:
             self.cur.execute(sql)
             # fetchall()返回的结果是list，list里面再嵌套list
@@ -53,8 +39,68 @@ class Mysql(object):
                 return name, info, imgPath
         except  Exception as e:
             print(e + "select data fail")
-        else:
-            print("查询数据库成功")
+
+
+    # 注册新的消费者用户
+    def AddConsumer(self, consumerAccount, consumerPassword):
+        sql = "INSERT INTO consumerInfo_table (consumerAccount, consumerPassword) VALUES ('%s','%s')"%(consumerAccount,consumerPassword)
+        try:
+            self.cur.execute(sql)
+            self.conn.commit()
+            print("消费者信息注册成功")
+        except  Exception as e:
+            print(e + "insert consumerAccount fail")
+
+
+    # 判断是否存在消费者账户 如果存在返回exist  不存在返回notExist
+    def ifExistConsumerAccount(self, consumerAccount):
+        sql =  "select * from consumerInfo_table where consumerAccount = '%s'" %consumerAccount
+        try:
+            self.cur.execute(sql)
+            res = self.cur.fetchall()
+            if res == ():
+                print("不存在该消费者账户")
+                return "notExist"
+            else:
+                print("请更改")
+                return "exist"
+        except  Exception as e:
+            print(e)
+
+
+    # 判断消费者账号、密码是否正确 正确返回true 错误返回false
+    def ifTrueConsumer(self, consumerAccount, consumerPassword):
+        sql = "select * from consumerInfo_table where consumerAccount = '%s' and consumerPassword = '%s'" % (consumerAccount, consumerPassword)
+        try:
+            self.cur.execute(sql)
+            res = self.cur.fetchall()
+            if res == ():
+                print("消费者账号密码错误")
+                return "false"
+            else:
+                print("消费者账号密码正确")
+                return "true"
+        except  Exception as e:
+            print(e)
+
+
+
+
+    # 判断管理员账号、密码是否正确 正确返回true 错误返回false
+    def ifTrueAdmin(self, adminAccount, adminPassword):
+        sql =  "select * from adminInfo_table where adminAccount = '%s' and adminPassword = '%s'" %(adminAccount, adminPassword)
+        try:
+            self.cur.execute(sql)
+            res = self.cur.fetchall()
+            if res == ():
+                print("管理员账号密码错误")
+                return "false"
+            else:
+                print("管理员账号密码正确")
+                return "true"
+        except  Exception as e:
+            print(e)
+
 
     # 关闭数据库连接
     def close(self):
@@ -62,9 +108,22 @@ class Mysql(object):
         self.conn.close()
         print("关闭数据库成功")
 
+
 if __name__ == "__main__":
     mysql = Mysql()
-    name, info, imgPath = mysql.show("苍耳子")
-    print(imgPath)
+    # name, info, imgPath = mysql.show("苍耳子")
+    # print(imgPath)
+
+    # # 插入消费者账号
+    # mysql.AddConsumer("zzz123213","6666666")
+
+    # ##判断管理员账号、密码是否正确
+    # result = mysql.ifTrueAdmin("123","456")
+    # print(result)
+
+    # #判断消费者账号、密码是否正确
+    result = mysql.ifTrueConsumer("1234","5678")
+    print(result)
+
     mysql.close()
 

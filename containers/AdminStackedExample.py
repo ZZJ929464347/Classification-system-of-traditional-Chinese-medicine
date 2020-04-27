@@ -1,16 +1,16 @@
 import sys
 from PyQt5.QtWidgets import *
-from StackedExampleUi import HomePageUi
+from AdminStackedExampleUi import HomePageUi
 
 # HomePageUi是第一个主界面
-class StackedExample(HomePageUi):
+class AdminStackedExample(HomePageUi):
     def __init__(self, parent=None):
-        super(StackedExample, self).__init__(parent)
+        super(AdminStackedExample, self).__init__(parent)
         self.setUpUi()
 
 
 if __name__ == '__main__':
     app=QApplication(sys.argv)
-    demo=StackedExample()
+    demo=AdminStackedExample()
     demo.show()
     sys.exit(app.exec_())
