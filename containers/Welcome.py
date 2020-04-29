@@ -11,6 +11,7 @@ class WelcomeUi(QWidget):
     def __init__(self, parent=None):
         super(WelcomeUi, self).__init__(parent)
         self.setWindowTitle("欢迎界面")
+        self.setWindowIcon(QIcon('../source/img/logo.jpg'))
         self.setGeometry(400, 150, 1200, 760)
         window_pale = QtGui.QPalette()
         window_pale.setBrush(self.backgroundRole(),  QtGui.QBrush(QtGui.QPixmap("../source/img/backgroundImage.jpg")))
